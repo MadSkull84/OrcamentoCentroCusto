@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, Vcl.ExtCtrls,
   Data.DB, Vcl.Grids, Vcl.DBGrids, Datasnap.DBClient, Vcl.Buttons, uObserverResumoOrcamento,
   uConcreteSubjectOrcamentoCentroCusto, uObserverResumoCentroCustoPai,
-  uObserverResumoCentroCustoFilho, uServiceOrcamentoCentroCusto;
+  uObserverResumoCentroCustoFilho, uServiceOrcamentoCentroCusto, uOrcamentoCentroCusto;
 
 type
   TfrmPrincipal = class(TForm)
@@ -61,56 +61,122 @@ type
     FServiceOrcamentoCentroCusto: TServiceOrcamentoCentroCusto;
 
     property ServiceOrcamentoCentroCusto: TServiceOrcamentoCentroCusto read FServiceOrcamentoCentroCusto;
+    procedure InitClientDataSets;
+    procedure InitObservers;
+    procedure Save;
+    function InitOrcamentoCentroCusto: TOrcamentoCentroCusto;
+    function isAllowedCurrency(const Key: Char): Boolean;
+    function isAllowedInteger(const Key: Char): Boolean;
+    function isAllowed(const Key: Char; const AllowedKeyList: TSysCharSet): Boolean;
   public
     { Public declarations }
   end;
+
+const
+  NONE = #0;
+  BACK_SPACE = #8;
+  SEMICOLON = #44;
 
 var
   frmPrincipal: TfrmPrincipal;
 
 implementation
 
-uses uOrcamentoCentroCusto;
+uses System.Math;
 
 {$R *.dfm}
 
 procedure TfrmPrincipal.edtCentroCustoKeyPress(Sender: TObject; var Key: Char);
 begin
-  if not (CharInSet(Key, ['0'..'9', #8])) then
-    Key := #0;
+  if not isAllowedInteger(Key) then
+    Key := NONE;
 end;
 
-procedure TfrmPrincipal.edtOrcamentoKeyPress(Sender: TObject; var Key: Char);
-begin
-  if not (CharInSet(Key, ['0'..'9', #8])) then
-    Key := #0;
-end;
-
-procedure TfrmPrincipal.edtValorKeyPress(Sender: TObject; var Key: Char);
-begin
-  if not (CharInSet(Key, ['0'..'9', #8, #44])) then
-    Key := #0;
-end;
-
-procedure TfrmPrincipal.FormCreate(Sender: TObject);
+procedure TfrmPrincipal.InitClientDataSets;
 begin
   cdsOrcamentoCC.CreateDataSet;
   cdsResumoOrcamento.CreateDataSet;
   cdsResumoCentroCustoPai.CreateDataSet;
   cdsResumoCentroCustoFilho.CreateDataSet;
+end;
 
-  Self.FObserverResumoOrcamento :=
-    TObserverResumoOrcamento.Create(cdsResumoOrcamento);
-  Self.FObserverResumoCentroCustoPai :=
-    TObserverResumoCentroCustoPai.Create(cdsResumoCentroCustoPai);
-  Self.FObserverResumoCentroCustoFilho :=
-    TObserverResumoCentroCustoFilho.Create(cdsResumoCentroCustoFilho);
+procedure TfrmPrincipal.InitObservers;
+begin
+  Self.FObserverResumoOrcamento := TObserverResumoOrcamento.Create(cdsResumoOrcamento);
+  Self.FObserverResumoCentroCustoPai := TObserverResumoCentroCustoPai.Create(cdsResumoCentroCustoPai);
+  Self.FObserverResumoCentroCustoFilho := TObserverResumoCentroCustoFilho.Create(cdsResumoCentroCustoFilho);
   Self.FConcreteSubjectOrcamentoCentroCusto := TConcreteSubjectOrcamentoCentroCusto.Create;
   Self.FServiceOrcamentoCentroCusto := TServiceOrcamentoCentroCusto.Create(cdsOrcamentoCC);
-
   Self.FConcreteSubjectOrcamentoCentroCusto.AddObserver(Self.FObserverResumoOrcamento);
   Self.FConcreteSubjectOrcamentoCentroCusto.AddObserver(Self.FObserverResumoCentroCustoPai);
   Self.FConcreteSubjectOrcamentoCentroCusto.AddObserver(Self.FObserverResumoCentroCustoFilho);
+end;
+
+function TfrmPrincipal.InitOrcamentoCentroCusto: TOrcamentoCentroCusto;
+var
+  oOrcamentoCentroCusto: TOrcamentoCentroCusto;
+begin
+  oOrcamentoCentroCusto := TOrcamentoCentroCusto.Create;
+  oOrcamentoCentroCusto.Orcamento := StrToIntDef(edtOrcamento.Text, System.Math.NegativeValue);
+  oOrcamentoCentroCusto.CentroCustoPai := Copy(edtCentroCusto.Text, System.Math.ZeroValue, 2);
+  oOrcamentoCentroCusto.CentroCustoFilho := Copy(edtCentroCusto.Text, 3, 6);
+  oOrcamentoCentroCusto.CentroCusto := edtCentroCusto.Text;
+  oOrcamentoCentroCusto.Valor := StrToCurrDef((edtValor.Text), System.Math.ZeroValue);
+  Result := oOrcamentoCentroCusto;
+end;
+
+function TfrmPrincipal.isAllowed(const Key: Char;
+  const AllowedKeyList: TSysCharSet): Boolean;
+begin
+  Result := CharInSet(Key, AllowedKeyList);
+end;
+
+function TfrmPrincipal.isAllowedCurrency(const Key: Char): Boolean;
+begin
+  Result := isAllowed(Key, ['0'..'9', BACK_SPACE,SEMICOLON]);
+end;
+
+function TfrmPrincipal.isAllowedInteger(const Key: Char): Boolean;
+begin
+  Result := isAllowed(Key, ['0'..'9', BACK_SPACE]);
+end;
+
+procedure TfrmPrincipal.Save;
+var
+  oOrcamentoCentroCusto: TOrcamentoCentroCusto;
+  sMsgError: string;
+begin
+    oOrcamentoCentroCusto := InitOrcamentoCentroCusto;
+  try
+    if not ServiceOrcamentoCentroCusto.IsRequiredFieldsValid(oOrcamentoCentroCusto, sMsgError) then
+    begin
+      Application.MessageBox(PWideChar(sMsgError), 'Aviso', MB_ICONERROR + MB_OK);
+      Exit();
+    end;
+
+    ServiceOrcamentoCentroCusto.Insert(oOrcamentoCentroCusto);
+    Self.FConcreteSubjectOrcamentoCentroCusto.Notify(oOrcamentoCentroCusto);
+  finally
+    FreeAndNil(oOrcamentoCentroCusto);
+  end;
+end;
+
+procedure TfrmPrincipal.edtOrcamentoKeyPress(Sender: TObject; var Key: Char);
+begin
+  if not isAllowedInteger(Key) then
+    Key := NONE;
+end;
+
+procedure TfrmPrincipal.edtValorKeyPress(Sender: TObject; var Key: Char);
+begin
+  if not isAllowedCurrency(Key) then
+    Key := NONE;
+end;
+
+procedure TfrmPrincipal.FormCreate(Sender: TObject);
+begin
+  Self.InitClientDataSets;
+  Self.InitObservers;
 end;
 
 procedure TfrmPrincipal.FormDestroy(Sender: TObject);
@@ -120,30 +186,9 @@ begin
 end;
 
 procedure TfrmPrincipal.btnSalvarClick(Sender: TObject);
-var
-  oOrcamentoCentroCusto: TOrcamentoCentroCusto;
-  sMsgError: String;
-begin
-  oOrcamentoCentroCusto := TOrcamentoCentroCusto.Create;
-  try
-    oOrcamentoCentroCusto.Orcamento := StrToIntDef(edtOrcamento.Text, -1);
-    oOrcamentoCentroCusto.CentroCustoPai := Copy(edtCentroCusto.Text, 0, 2);
-    oOrcamentoCentroCusto.CentroCustoFilho := Copy(edtCentroCusto.Text, 3, 6);
-    oOrcamentoCentroCusto.CentroCusto := edtCentroCusto.Text;
-    oOrcamentoCentroCusto.Valor := StrToCurrDef((edtValor.Text), 0);
-    if not ServiceOrcamentoCentroCusto.IsRequiredFieldsValid(oOrcamentoCentroCusto, sMsgError) then
-      Application.MessageBox(PWideChar(sMsgError), 'Aviso', MB_ICONERROR + MB_OK)
-    else
-    begin
-      ServiceOrcamentoCentroCusto.Insert(oOrcamentoCentroCusto);
-      Self.FConcreteSubjectOrcamentoCentroCusto.Notify(oOrcamentoCentroCusto);
-    end;
-  finally
-    FreeAndNil(oOrcamentoCentroCusto);
-  end;
-end;
 
-initialization
-  ReportMemoryLeaksOnShutdown := True;
+begin
+  Self.Save;
+end;
 
 end.
