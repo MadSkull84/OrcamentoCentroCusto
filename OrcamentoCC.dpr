@@ -12,7 +12,10 @@ uses
   uServiceResumo in 'OrcamentoCentroCusto\Service\uServiceResumo.pas',
   uObserverResumoCentroCustoFilho in 'OrcamentoCentroCusto\Observer\uObserverResumoCentroCustoFilho.pas',
   uServiceOrcamentoCentroCusto in 'OrcamentoCentroCusto\Service\uServiceOrcamentoCentroCusto.pas',
-  uOrcamentoCentroCustoDAO in 'OrcamentoCentroCusto\DAO\uOrcamentoCentroCustoDAO.pas';
+  uOrcamentoCentroCustoDAO in 'OrcamentoCentroCusto\DAO\uOrcamentoCentroCustoDAO.pas',
+  uCadOrcamentoCentroCusto in 'OrcamentoCentroCusto\View\uCadOrcamentoCentroCusto.pas' {frmCadOrcamentoCentroCusto},
+  udmDataBase in 'Connection\udmDataBase.pas' {dmDataBase: TDataModule},
+  uConfigFile in 'Utils\uConfigFile.pas';
 
 {$R *.res}
 
@@ -22,6 +25,7 @@ begin
   ReportMemoryLeaksOnShutdown:= True;
   {$ENDIF}
   Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TdmDataBase, dmDataBase);
   Application.CreateForm(TfrmPrincipal, frmPrincipal);
   Application.Run;
 end.

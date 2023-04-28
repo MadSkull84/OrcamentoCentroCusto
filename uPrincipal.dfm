@@ -22,76 +22,71 @@ object frmPrincipal: TfrmPrincipal
     Left = 0
     Top = 0
     Width = 780
-    Height = 65
+    Height = 193
     Align = alTop
     TabOrder = 0
-    object btnSalvar: TSpeedButton
-      Left = 304
-      Top = 24
-      Width = 82
-      Height = 21
-      Caption = 'Salvar'
-      OnClick = btnSalvarClick
-    end
-    object lblCentroCusto: TLabel
-      Left = 120
-      Top = 8
-      Width = 79
-      Height = 13
-      Caption = 'Centro de Custo'
-    end
-    object lblValor: TLabel
-      Left = 224
-      Top = 8
-      Width = 24
-      Height = 13
-      Caption = 'Valor'
-    end
-    object lblOrcamento: TLabel
-      Left = 24
-      Top = 8
-      Width = 53
-      Height = 13
-      Caption = 'Or'#231'amento'
-    end
-    object edtValor: TEdit
-      Left = 224
-      Top = 24
-      Width = 66
-      Height = 21
-      TabOrder = 2
-      OnKeyPress = edtValorKeyPress
-    end
-    object edtOrcamento: TEdit
-      Left = 24
-      Top = 24
-      Width = 73
-      Height = 21
-      MaxLength = 6
+    object Panel3: TPanel
+      Left = 1
+      Top = 155
+      Width = 778
+      Height = 37
+      Align = alBottom
       TabOrder = 0
-      OnKeyPress = edtOrcamentoKeyPress
+      object btnNovo: TSpeedButton
+        Left = 8
+        Top = 8
+        Width = 82
+        Height = 21
+        Caption = 'Novo'
+        OnClick = btnNovoClick
+      end
     end
-    object edtCentroCusto: TEdit
-      Left = 120
-      Top = 24
-      Width = 79
-      Height = 21
-      MaxLength = 6
+    object grdOrcamentoCentroCusto: TDBGrid
+      Left = 1
+      Top = 1
+      Width = 778
+      Height = 154
+      Align = alClient
+      DataSource = dsOrcamentoCC
+      Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
       TabOrder = 1
-      OnKeyPress = edtCentroCustoKeyPress
+      TitleFont.Charset = DEFAULT_CHARSET
+      TitleFont.Color = clWindowText
+      TitleFont.Height = -11
+      TitleFont.Name = 'Tahoma'
+      TitleFont.Style = []
+      Columns = <
+        item
+          Expanded = False
+          FieldName = 'ORCAMENTO'
+          Width = 236
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'CENTRO_CUSTO'
+          Width = 261
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'VALOR'
+          Width = 243
+          Visible = True
+        end>
     end
   end
   object Panel2: TPanel
     Left = 0
-    Top = 65
+    Top = 193
     Width = 780
-    Height = 362
+    Height = 234
     Align = alClient
     TabOrder = 1
     object Splitter1: TSplitter
       Left = 248
       Top = 1
-      Height = 360
+      Height = 232
       ExplicitLeft = 328
       ExplicitTop = 112
       ExplicitHeight = 100
@@ -99,7 +94,7 @@ object frmPrincipal: TfrmPrincipal
     object Splitter2: TSplitter
       Left = 517
       Top = 1
-      Height = 360
+      Height = 232
       Align = alRight
       ExplicitLeft = 304
       ExplicitTop = 176
@@ -109,7 +104,7 @@ object frmPrincipal: TfrmPrincipal
       Left = 1
       Top = 1
       Width = 247
-      Height = 360
+      Height = 232
       Align = alLeft
       DataSource = dsResumoOrcamento
       Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
@@ -137,7 +132,7 @@ object frmPrincipal: TfrmPrincipal
       Left = 251
       Top = 1
       Width = 266
-      Height = 360
+      Height = 232
       Align = alClient
       DataSource = dsResumoCentroCustoPai
       Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
@@ -165,7 +160,7 @@ object frmPrincipal: TfrmPrincipal
       Left = 520
       Top = 1
       Width = 259
-      Height = 360
+      Height = 232
       Align = alRight
       DataSource = dsResumoCentroCustoFilho
       Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
@@ -196,7 +191,7 @@ object frmPrincipal: TfrmPrincipal
     Left = 424
     Top = 17
     object cdsOrcamentoCCID: TIntegerField
-      AutoGenerateValue = arAutoInc
+      DisplayLabel = 'Id'
       FieldName = 'ID'
       ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
       Visible = False
@@ -211,14 +206,17 @@ object frmPrincipal: TfrmPrincipal
       FieldName = 'ORCAMENTO'
     end
     object cdsOrcamentoCCCENTRO_CUSTO: TStringField
+      DisplayLabel = 'Centro Custo'
       FieldName = 'CENTRO_CUSTO'
       Size = 6
     end
     object cdsOrcamentoCCCENTRO_CUSTO_PAI: TStringField
+      DisplayLabel = 'Centro Custo Pai'
       FieldName = 'CENTRO_CUSTO_PAI'
       Size = 2
     end
     object cdsOrcamentoCCCENTRO_CUSTO_FILHO: TStringField
+      DisplayLabel = 'Centro Custo Filho'
       FieldName = 'CENTRO_CUSTO_FILHO'
       Size = 4
     end
@@ -232,8 +230,8 @@ object frmPrincipal: TfrmPrincipal
   object cdsResumoOrcamento: TClientDataSet
     Aggregates = <>
     Params = <>
-    Left = 48
-    Top = 129
+    Left = 40
+    Top = 313
     object cdsResumoOrcamentoID: TSmallintField
       AutoGenerateValue = arAutoInc
       FieldName = 'ID'
@@ -251,14 +249,14 @@ object frmPrincipal: TfrmPrincipal
   object dsResumoOrcamento: TDataSource
     AutoEdit = False
     DataSet = cdsResumoOrcamento
-    Left = 48
-    Top = 177
+    Left = 40
+    Top = 353
   end
   object cdsResumoCentroCustoPai: TClientDataSet
     Aggregates = <>
     Params = <>
-    Left = 296
-    Top = 129
+    Left = 280
+    Top = 313
     object cdsResumoCentroCustoPaiVALOR: TCurrencyField
       DisplayLabel = 'Valor'
       FieldName = 'VALOR'
@@ -273,14 +271,14 @@ object frmPrincipal: TfrmPrincipal
   object dsResumoCentroCustoPai: TDataSource
     AutoEdit = False
     DataSet = cdsResumoCentroCustoPai
-    Left = 296
-    Top = 177
+    Left = 280
+    Top = 353
   end
   object cdsResumoCentroCustoFilho: TClientDataSet
     Aggregates = <>
     Params = <>
-    Left = 576
-    Top = 145
+    Left = 560
+    Top = 321
     object cdsResumoCentroCustoFilhoCENTRO_CUSTO_FILHO: TStringField
       DisplayLabel = 'Centro Custo Filho'
       FieldName = 'CENTRO_CUSTO_FILHO'
@@ -295,7 +293,7 @@ object frmPrincipal: TfrmPrincipal
   object dsResumoCentroCustoFilho: TDataSource
     AutoEdit = False
     DataSet = cdsResumoCentroCustoFilho
-    Left = 576
-    Top = 193
+    Left = 560
+    Top = 361
   end
 end

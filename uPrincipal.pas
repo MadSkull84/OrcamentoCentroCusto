@@ -13,17 +13,11 @@ type
   TfrmPrincipal = class(TForm)
     Panel1: TPanel;
     Panel2: TPanel;
-    edtValor: TEdit;
-    btnSalvar: TSpeedButton;
     cdsOrcamentoCC: TClientDataSet;
     dsOrcamentoCC: TDataSource;
     grdResumoOrcamento: TDBGrid;
     cdsOrcamentoCCID: TIntegerField;
     cdsOrcamentoCCVALOR: TCurrencyField;
-    lblCentroCusto: TLabel;
-    lblValor: TLabel;
-    lblOrcamento: TLabel;
-    edtOrcamento: TEdit;
     cdsOrcamentoCCORCAMENTO: TSmallintField;
     grdResumoCentroCustoPai: TDBGrid;
     grdResumoCentroCustoFilho: TDBGrid;
@@ -45,8 +39,10 @@ type
     dsResumoCentroCustoFilho: TDataSource;
     cdsResumoCentroCustoFilhoCENTRO_CUSTO_FILHO: TStringField;
     cdsResumoCentroCustoFilhoVALOR: TCurrencyField;
-    edtCentroCusto: TEdit;
-    procedure btnSalvarClick(Sender: TObject);
+    Panel3: TPanel;
+    btnNovo: TSpeedButton;
+    grdOrcamentoCentroCusto: TDBGrid;
+    procedure btnNovoClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure edtValorKeyPress(Sender: TObject; var Key: Char);
     procedure edtOrcamentoKeyPress(Sender: TObject; var Key: Char);
@@ -61,10 +57,15 @@ type
     FServiceOrcamentoCentroCusto: TServiceOrcamentoCentroCusto;
 
     property ServiceOrcamentoCentroCusto: TServiceOrcamentoCentroCusto read FServiceOrcamentoCentroCusto;
+
     procedure InitClientDataSets;
     procedure InitObservers;
-    procedure Save;
-    function InitOrcamentoCentroCusto: TOrcamentoCentroCusto;
+    procedure InitServiceOrcamentoCentroCusto;
+    procedure CallViewCadOrcamentoCentroCusto;
+    procedure LoadXMLFile;
+    procedure SaveXMLFile;
+
+
     function isAllowedCurrency(const Key: Char): Boolean;
     function isAllowedInteger(const Key: Char): Boolean;
     function isAllowed(const Key: Char; const AllowedKeyList: TSysCharSet): Boolean;
@@ -82,9 +83,23 @@ var
 
 implementation
 
-uses System.Math;
+uses System.Math, uCadOrcamentoCentroCusto, uConfigFile;
 
 {$R *.dfm}
+
+procedure TfrmPrincipal.CallViewCadOrcamentoCentroCusto;
+var
+  ofrmCadOrcamentoCentroCusto: TfrmCadOrcamentoCentroCusto;
+begin
+  ofrmCadOrcamentoCentroCusto := TfrmCadOrcamentoCentroCusto.Create(Self);
+  try
+    ofrmCadOrcamentoCentroCusto.CdsOrcamentoCentroCusto := cdsOrcamentoCC;
+    ofrmCadOrcamentoCentroCusto.ConcreteSubjectOrcamentoCentroCusto := Self.FConcreteSubjectOrcamentoCentroCusto;
+    ofrmCadOrcamentoCentroCusto.ShowModal;
+  finally
+    FreeAndNil(ofrmCadOrcamentoCentroCusto);
+  end;
+end;
 
 procedure TfrmPrincipal.edtCentroCustoKeyPress(Sender: TObject; var Key: Char);
 begin
@@ -106,29 +121,21 @@ begin
   Self.FObserverResumoCentroCustoPai := TObserverResumoCentroCustoPai.Create(cdsResumoCentroCustoPai);
   Self.FObserverResumoCentroCustoFilho := TObserverResumoCentroCustoFilho.Create(cdsResumoCentroCustoFilho);
   Self.FConcreteSubjectOrcamentoCentroCusto := TConcreteSubjectOrcamentoCentroCusto.Create;
-  Self.FServiceOrcamentoCentroCusto := TServiceOrcamentoCentroCusto.Create(cdsOrcamentoCC);
+
   Self.FConcreteSubjectOrcamentoCentroCusto.AddObserver(Self.FObserverResumoOrcamento);
   Self.FConcreteSubjectOrcamentoCentroCusto.AddObserver(Self.FObserverResumoCentroCustoPai);
   Self.FConcreteSubjectOrcamentoCentroCusto.AddObserver(Self.FObserverResumoCentroCustoFilho);
-end;
-
-function TfrmPrincipal.InitOrcamentoCentroCusto: TOrcamentoCentroCusto;
-var
-  oOrcamentoCentroCusto: TOrcamentoCentroCusto;
-begin
-  oOrcamentoCentroCusto := TOrcamentoCentroCusto.Create;
-  oOrcamentoCentroCusto.Orcamento := StrToIntDef(edtOrcamento.Text, System.Math.NegativeValue);
-  oOrcamentoCentroCusto.CentroCustoPai := Copy(edtCentroCusto.Text, System.Math.ZeroValue, 2);
-  oOrcamentoCentroCusto.CentroCustoFilho := Copy(edtCentroCusto.Text, 3, 6);
-  oOrcamentoCentroCusto.CentroCusto := edtCentroCusto.Text;
-  oOrcamentoCentroCusto.Valor := StrToCurrDef((edtValor.Text), System.Math.ZeroValue);
-  Result := oOrcamentoCentroCusto;
 end;
 
 function TfrmPrincipal.isAllowed(const Key: Char;
   const AllowedKeyList: TSysCharSet): Boolean;
 begin
   Result := CharInSet(Key, AllowedKeyList);
+end;
+
+procedure TfrmPrincipal.InitServiceOrcamentoCentroCusto;
+begin
+  Self.FServiceOrcamentoCentroCusto := TServiceOrcamentoCentroCusto.Create(cdsOrcamentoCC);
 end;
 
 function TfrmPrincipal.isAllowedCurrency(const Key: Char): Boolean;
@@ -141,23 +148,20 @@ begin
   Result := isAllowed(Key, ['0'..'9', BACK_SPACE]);
 end;
 
-procedure TfrmPrincipal.Save;
-var
-  oOrcamentoCentroCusto: TOrcamentoCentroCusto;
-  sMsgError: string;
+procedure TfrmPrincipal.LoadXMLFile;
 begin
-    oOrcamentoCentroCusto := InitOrcamentoCentroCusto;
-  try
-    if not ServiceOrcamentoCentroCusto.IsRequiredFieldsValid(oOrcamentoCentroCusto, sMsgError) then
-    begin
-      Application.MessageBox(PWideChar(sMsgError), 'Aviso', MB_ICONERROR + MB_OK);
-      Exit();
-    end;
+  if (not TConfigFile.GetInstance.IsDataBasePostgreSql) and
+     (FileExists(ExtractFilePath(Application.ExeName)+'orcamentocentrocusto.xml')) then
+  begin
+    cdsOrcamentoCC.LoadFromFile(ExtractFilePath(Application.ExeName)+'orcamentocentrocusto.xml');
+  end;
+end;
 
-    ServiceOrcamentoCentroCusto.Insert(oOrcamentoCentroCusto);
-    Self.FConcreteSubjectOrcamentoCentroCusto.Notify(oOrcamentoCentroCusto);
-  finally
-    FreeAndNil(oOrcamentoCentroCusto);
+procedure TfrmPrincipal.SaveXMLFile;
+begin
+  if (not TConfigFile.GetInstance.IsDataBasePostgreSql) then
+  begin
+    cdsOrcamentoCC.SaveToFile(ExtractFilePath(Application.ExeName)+'orcamentocentrocusto.xml');
   end;
 end;
 
@@ -177,18 +181,20 @@ procedure TfrmPrincipal.FormCreate(Sender: TObject);
 begin
   Self.InitClientDataSets;
   Self.InitObservers;
+  Self.InitServiceOrcamentoCentroCusto;
+  Self.LoadXMLFile;
 end;
 
 procedure TfrmPrincipal.FormDestroy(Sender: TObject);
 begin
   Self.FConcreteSubjectOrcamentoCentroCusto.Free;
   Self.FServiceOrcamentoCentroCusto.Free;
+  Self.SaveXMLFile;
 end;
 
-procedure TfrmPrincipal.btnSalvarClick(Sender: TObject);
-
+procedure TfrmPrincipal.btnNovoClick(Sender: TObject);
 begin
-  Self.Save;
+  Self.CallViewCadOrcamentoCentroCusto;
 end;
 
 end.
