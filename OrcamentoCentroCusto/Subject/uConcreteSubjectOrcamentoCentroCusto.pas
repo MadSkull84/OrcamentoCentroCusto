@@ -8,7 +8,7 @@ uses System.Classes, SubjectOrcamentoCentroCusto, ObserverOrcamentoCentroCusto, 
 type
   TConcreteSubjectOrcamentoCentroCusto = class(TInterfacedObject, ISubjectOrcamentoCentroCusto)
   private
-    FObservers: TList<IObserverOrcamentoCentroCusto>;
+    FObserverOrcamentoCentroCustoList: TList<IObserverOrcamentoCentroCusto>;
   public
     constructor Create();
     destructor Destroy; override;
@@ -26,33 +26,33 @@ uses uServiceOrcamentoCentroCusto, System.SysUtils;
 
 procedure TConcreteSubjectOrcamentoCentroCusto.AddObserver(oObserver: IObserverOrcamentoCentroCusto);
 begin
-  Self.FObservers.Add(oObserver);
+  Self.FObserverOrcamentoCentroCustoList.Add(oObserver);
 end;
 
 constructor TConcreteSubjectOrcamentoCentroCusto.Create();
 begin
   inherited;
-  Self.FObservers := TList<IObserverOrcamentoCentroCusto>.Create;
+  Self.FObserverOrcamentoCentroCustoList := TList<IObserverOrcamentoCentroCusto>.Create;
 end;
 
 procedure TConcreteSubjectOrcamentoCentroCusto.DelObserver(oObserver: IObserverOrcamentoCentroCusto);
 begin
-  Self.FObservers.Delete(FObservers.IndexOf(oObserver));
+  Self.FObserverOrcamentoCentroCustoList.Delete(FObserverOrcamentoCentroCustoList.IndexOf(oObserver));
 end;
 
 destructor TConcreteSubjectOrcamentoCentroCusto.Destroy;
 begin
-  FObservers.Free;
+  FObserverOrcamentoCentroCustoList.Free;
   inherited;
 end;
 
 procedure TConcreteSubjectOrcamentoCentroCusto.Notify(oOrcamentoCentroCusto: TOrcamentoCentroCusto);
 var
-  Observer: IObserverOrcamentoCentroCusto;
+  ObserverOrcamentoCentroCusto: IObserverOrcamentoCentroCusto;
 begin
-  for Observer in FObservers do
+  for ObserverOrcamentoCentroCusto in FObserverOrcamentoCentroCustoList do
   begin
-    Observer.Update(oOrcamentoCentroCusto);
+    ObserverOrcamentoCentroCusto.Update(oOrcamentoCentroCusto);
   end;
 end;
 

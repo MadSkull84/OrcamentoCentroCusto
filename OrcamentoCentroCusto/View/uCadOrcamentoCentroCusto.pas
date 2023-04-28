@@ -32,20 +32,23 @@ type
     FServiceOrcamentoCentroCusto: TServiceOrcamentoCentroCusto;
     FConcreteSubjectOrcamentoCentroCusto: TConcreteSubjectOrcamentoCentroCusto;
     FCdsOrcamentoCentroCusto: TClientDataSet;
+    FOrcamentoCentroCusto: TOrcamentoCentroCusto;
 
     property ServiceOrcamentoCentroCusto: TServiceOrcamentoCentroCusto read FServiceOrcamentoCentroCusto;
 
     function IsAllowedCurrency(const Key: Char): Boolean;
     function IsAllowedInteger(const Key: Char): Boolean;
     function IsAllowed(const Key: Char; const AllowedKeyList: TSysCharSet): Boolean;
-    function InitOrcamentoCentroCusto: TOrcamentoCentroCusto;
 
+    procedure SetOrcamentoCentroCusto;
+    procedure SetFields;
     procedure InitServiceOrcamentoCentroCusto;
     procedure Save;
   public
     { Public declarations }
     property ConcreteSubjectOrcamentoCentroCusto: TConcreteSubjectOrcamentoCentroCusto read FConcreteSubjectOrcamentoCentroCusto write FConcreteSubjectOrcamentoCentroCusto;
     property CdsOrcamentoCentroCusto: TClientDataSet read FCdsOrcamentoCentroCusto write FCdsOrcamentoCentroCusto;
+    property OrcamentoCentroCusto: TOrcamentoCentroCusto read FOrcamentoCentroCusto write FOrcamentoCentroCusto;
   end;
 
 const
@@ -80,35 +83,38 @@ end;
 
 procedure TfrmCadOrcamentoCentroCusto.Save;
 var
-  oOrcamentoCentroCusto: TOrcamentoCentroCusto;
   sMsgError: string;
 begin
-  oOrcamentoCentroCusto := InitOrcamentoCentroCusto;
-  try
-    if not ServiceOrcamentoCentroCusto.IsRequiredFieldsValid(oOrcamentoCentroCusto, sMsgError) then
-    begin
-      Application.MessageBox(PWideChar(sMsgError), 'Aviso', MB_ICONERROR + MB_OK);
-      Exit();
-    end;
-
-    ServiceOrcamentoCentroCusto.Insert(oOrcamentoCentroCusto);
-    ConcreteSubjectOrcamentoCentroCusto.Notify(oOrcamentoCentroCusto);
-  finally
-    FreeAndNil(oOrcamentoCentroCusto);
+  Self.SetOrcamentoCentroCusto;
+  if not ServiceOrcamentoCentroCusto.IsRequiredFieldsValid(Self.OrcamentoCentroCusto, sMsgError) then
+  begin
+    Application.MessageBox(PWideChar(sMsgError), 'Aviso', MB_ICONERROR + MB_OK);
+    Exit();
   end;
+
+  ServiceOrcamentoCentroCusto.Save(Self.OrcamentoCentroCusto);
+  ConcreteSubjectOrcamentoCentroCusto.Notify(Self.OrcamentoCentroCusto);
 end;
 
-function TfrmCadOrcamentoCentroCusto.InitOrcamentoCentroCusto: TOrcamentoCentroCusto;
-var
-  oOrcamentoCentroCusto: TOrcamentoCentroCusto;
+procedure TfrmCadOrcamentoCentroCusto.SetFields;
 begin
-  oOrcamentoCentroCusto := TOrcamentoCentroCusto.Create;
-  oOrcamentoCentroCusto.Orcamento := StrToIntDef(edtOrcamento.Text, System.Math.NegativeValue);
-  oOrcamentoCentroCusto.CentroCustoPai := Copy(edtCentroCusto.Text, System.Math.ZeroValue, 2);
-  oOrcamentoCentroCusto.CentroCustoFilho := Copy(edtCentroCusto.Text, 3, 6);
-  oOrcamentoCentroCusto.CentroCusto := edtCentroCusto.Text;
-  oOrcamentoCentroCusto.Valor := StrToCurrDef((edtValor.Text), System.Math.ZeroValue);
-  Result := oOrcamentoCentroCusto;
+  edtOrcamento.Text := OrcamentoCentroCusto.Orcamento.ToString;
+  edtCentroCusto.Text := OrcamentoCentroCusto.CentroCusto;
+  edtValor.Text := CurrToStr(OrcamentoCentroCusto.Valor);
+end;
+
+procedure TfrmCadOrcamentoCentroCusto.SetOrcamentoCentroCusto;
+var
+  cValor: Currency;
+begin
+  OrcamentoCentroCusto.Orcamento := StrToIntDef(edtOrcamento.Text, System.Math.NegativeValue);
+  OrcamentoCentroCusto.CentroCustoPai := Copy(edtCentroCusto.Text, System.Math.ZeroValue, 2);
+  OrcamentoCentroCusto.CentroCustoFilho := Copy(edtCentroCusto.Text, 3, 6);
+  OrcamentoCentroCusto.CentroCusto := edtCentroCusto.Text;
+  cValor := StrToCurrDef((edtValor.Text), System.Math.ZeroValue);
+  if OrcamentoCentroCusto.Id > System.Math.ZeroValue then
+    OrcamentoCentroCusto.Diferenca := (OrcamentoCentroCusto.Valor - cValor) * System.Math.NegativeValue;
+  OrcamentoCentroCusto.Valor := cValor;
 end;
 
 procedure TfrmCadOrcamentoCentroCusto.InitServiceOrcamentoCentroCusto;
@@ -150,12 +156,15 @@ end;
 
 procedure TfrmCadOrcamentoCentroCusto.FormDestroy(Sender: TObject);
 begin
+  Self.FOrcamentoCentroCusto.Free;
   Self.FServiceOrcamentoCentroCusto.Free;
 end;
 
 procedure TfrmCadOrcamentoCentroCusto.FormShow(Sender: TObject);
 begin
   Self.InitServiceOrcamentoCentroCusto;
+  if OrcamentoCentroCusto.Id > System.Math.ZeroValue then
+    Self.SetFields;
 end;
 
 end.

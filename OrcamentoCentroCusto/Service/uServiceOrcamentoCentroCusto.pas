@@ -21,7 +21,9 @@ type
 
     function IsRequiredFieldsValid(oOrcamentoCentroCusto: TOrcamentoCentroCusto;
       var sMsgError: String): Boolean;
-    procedure Insert(oOrcamentoCentroCusto: TOrcamentoCentroCusto);
+    procedure Save(oOrcamentoCentroCusto: TOrcamentoCentroCusto);
+    procedure Delete(iId: SmallInt);
+    procedure LoadOrcamentoCentroCustoToCdsOrcamentoCC;
   end;
 
 implementation
@@ -35,6 +37,11 @@ constructor TServiceOrcamentoCentroCusto.Create(
 begin
   Self.FCdsOrcamentoCC := oCdsOrcamentoCC;
   FOrcamentoCentroCustoDAO := TOrcamentoCentroCustoDAO.Create(Self.FCdsOrcamentoCC);
+end;
+
+procedure TServiceOrcamentoCentroCusto.Delete(iId: SmallInt);
+begin
+  Self.FOrcamentoCentroCustoDAO.Delete(iId);
 end;
 
 destructor TServiceOrcamentoCentroCusto.Destroy;
@@ -74,6 +81,11 @@ begin
   Result := fValor > System.Math.ZeroValue;
 end;
 
+procedure TServiceOrcamentoCentroCusto.LoadOrcamentoCentroCustoToCdsOrcamentoCC;
+begin
+  Self.FOrcamentoCentroCustoDAO.LoadOrcamentoCentroCustoToCdsOrcamentoCC;
+end;
+
 function TServiceOrcamentoCentroCusto.IsRequiredFieldsValid(
   oOrcamentoCentroCusto: TOrcamentoCentroCusto; var sMsgError: String): Boolean;
 begin
@@ -94,10 +106,10 @@ begin
   Result := Trim(sMsgError) = EmptyStr;
 end;
 
-procedure TServiceOrcamentoCentroCusto.Insert(
+procedure TServiceOrcamentoCentroCusto.Save(
   oOrcamentoCentroCusto: TOrcamentoCentroCusto);
 begin
-  Self.FOrcamentoCentroCustoDAO.Insert(oOrcamentoCentroCusto);
+  Self.FOrcamentoCentroCustoDAO.Save(oOrcamentoCentroCusto);
 end;
 
 procedure TServiceOrcamentoCentroCusto.ConcatMessage(var sMsgError: string;

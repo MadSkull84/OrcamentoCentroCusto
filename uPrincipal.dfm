@@ -40,6 +40,22 @@ object frmPrincipal: TfrmPrincipal
         Caption = 'Novo'
         OnClick = btnNovoClick
       end
+      object btnAlterar: TSpeedButton
+        Left = 104
+        Top = 8
+        Width = 82
+        Height = 21
+        Caption = 'Alterar'
+        OnClick = btnAlterarClick
+      end
+      object btnExcluir: TSpeedButton
+        Left = 200
+        Top = 8
+        Width = 82
+        Height = 21
+        Caption = 'Excluir'
+        OnClick = btnExcluirClick
+      end
     end
     object grdOrcamentoCentroCusto: TDBGrid
       Left = 1

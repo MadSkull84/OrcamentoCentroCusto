@@ -16,7 +16,7 @@ type
 
 implementation
 
-uses Data.DB, System.SysUtils, uOrcamentoCentroCustoDAO;
+uses Data.DB, System.SysUtils, uOrcamentoCentroCustoDAO, System.Math;
 
 { TServiceResumo }
 
@@ -24,9 +24,9 @@ function TServiceResumo.getKeyValue(sKey: String;
   oOrcamentoCentroCusto: TOrcamentoCentroCusto): String;
 var sRetorno: String;
 begin
-  if CompareStr(sKey, uOrcamentoCentroCustoDAO.ORCAMENTO) = 0 then
+  if CompareStr(sKey, uOrcamentoCentroCusto.ORCAMENTO) = 0 then
     sRetorno := oOrcamentoCentroCusto.Orcamento.ToString
-  else if CompareStr(sKey, uOrcamentoCentroCustoDAO.CENTROCUSTOPAI) = 0 then
+  else if CompareStr(sKey, uOrcamentoCentroCusto.CENTROCUSTOPAI) = 0 then
     sRetorno := oOrcamentoCentroCusto.CentroCustoPai
   else
     sRetorno := oOrcamentoCentroCusto.CentroCustoFilho;
@@ -48,9 +48,13 @@ begin
     oCdsUpdate.Insert;
     oCdsUpdate.FieldByName(sKey).AsString := sValue;
   end;
-  oCdsUpdate.FieldByName(uOrcamentoCentroCustoDAO.VALOR).AsCurrency :=
-    oCdsUpdate.FieldByName(uOrcamentoCentroCustoDAO.VALOR).AsCurrency + oOrcamentoCentroCusto.Valor ;
+  oCdsUpdate.FieldByName(uOrcamentoCentroCusto.VALOR).AsCurrency :=
+    oCdsUpdate.FieldByName(uOrcamentoCentroCusto.VALOR).AsCurrency +
+    IfThen((oOrcamentoCentroCusto.Diferenca <> System.Math.ZeroValue), oOrcamentoCentroCusto.Diferenca, oOrcamentoCentroCusto.Valor);
   oCdsUpdate.Post;
+
+  if oCdsUpdate.FieldByName(uOrcamentoCentroCusto.VALOR).AsCurrency <= System.Math.ZeroValue then
+    oCdsUpdate.Delete;
 end;
 
 end.

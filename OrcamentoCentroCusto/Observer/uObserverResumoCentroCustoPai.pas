@@ -31,7 +31,7 @@ var oServiceResumo: TServiceResumo;
 begin
   oServiceResumo := TServiceResumo.Create();
   try
-    oServiceResumo.Update(uOrcamentoCentroCustoDAO.CENTROCUSTOPAI, oOrcamentoCentroCusto, Self.FCdsUpdate);
+    oServiceResumo.Update(uOrcamentoCentroCusto.CENTROCUSTOPAI, oOrcamentoCentroCusto, Self.FCdsUpdate);
   finally
     FreeAndNil(oServiceResumo);
   end;
