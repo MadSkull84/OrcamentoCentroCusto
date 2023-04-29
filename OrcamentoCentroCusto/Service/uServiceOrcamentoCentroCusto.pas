@@ -88,20 +88,25 @@ end;
 
 function TServiceOrcamentoCentroCusto.IsRequiredFieldsValid(
   oOrcamentoCentroCusto: TOrcamentoCentroCusto; var sMsgError: String): Boolean;
+const
+  MSG_ORCAMENTO_INVALIDO = 'Orçamento informado não é valido ou está vazio.';
+  MSG_CENTRO_CUSTO_PAI_INVALIDO = 'Centro de custo pai informado não é valido ou está vazio.';
+  MSG_CENTRO_CUSTO_FILHO_INVALIDO = 'Centro de custo filho informado não é valido ou está vazio.';
+  MSG_VALOR_INVALIDO = 'Valor informado não é valido ou está vazio.';
 begin
   sMsgError := EmptyStr;
 
   if not Self.IsOrcamentoValid(oOrcamentoCentroCusto.Orcamento) then
-    ConcatMessage(sMsgError, 'Orçamento informado não é valido ou está vazio.');
+    ConcatMessage(sMsgError, MSG_ORCAMENTO_INVALIDO);
 
   if not Self.IsCentroCustoPaiValid(oOrcamentoCentroCusto.CentroCustoPai) then
-    ConcatMessage(sMsgError, 'Centro de custo pai informado não é valido ou está vazio.');
+    ConcatMessage(sMsgError, MSG_CENTRO_CUSTO_PAI_INVALIDO);
 
   if not Self.IsCentroCustoFilhoValid(oOrcamentoCentroCusto.CentroCustoFilho) then
-    ConcatMessage(sMsgError, 'Centro de custo filho informado não é valido ou está vazio.');
+    ConcatMessage(sMsgError, MSG_CENTRO_CUSTO_FILHO_INVALIDO);
 
   if not Self.IsValorValid(oOrcamentoCentroCusto.Valor) then
-    ConcatMessage(sMsgError, 'Valor informado não é valido ou está vazio.');
+    ConcatMessage(sMsgError, MSG_VALOR_INVALIDO);
 
   Result := Trim(sMsgError) = EmptyStr;
 end;

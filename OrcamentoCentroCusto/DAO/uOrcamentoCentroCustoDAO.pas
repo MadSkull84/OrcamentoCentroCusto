@@ -2,7 +2,7 @@ unit uOrcamentoCentroCustoDAO;
 
 interface
 
-uses System.Classes, Datasnap.DBClient, uOrcamentoCentroCusto;
+uses System.Classes, Datasnap.DBClient, uOrcamentoCentroCusto, FireDAC.Comp.Client;
 
 type
   TOrcamentoCentroCustoDAO = class
@@ -17,6 +17,9 @@ type
     procedure SetOrcamentoCentroCustoDataBase(oOrcamentoCentroCusto: TOrcamentoCentroCusto);
     procedure InsertOrcamentoCentroCustoDataBase(oOrcamentoCentroCusto: TOrcamentoCentroCusto);
     procedure UpdateOrcamentoCentroCustoDataBase(oOrcamentoCentroCusto: TOrcamentoCentroCusto);
+
+    function GetConnectionPostgreSQL: TFDConnection;
+    function GetOrcamentoCentroCusto: TFDTable;
   public
     constructor Create(oCdsOrcamentoCC: TClientDataSet);
 
@@ -31,6 +34,13 @@ implementation
 
 uses udmDataBase, uConfigFile, System.Math;
 
+const
+  DATABASE = 'Database';
+  USER_NAME = 'User_Name';
+  PASSWORD = 'Password';
+  SERVER = 'Server';
+  PORT = 'Port';
+
 constructor TOrcamentoCentroCustoDAO.Create(oCdsOrcamentoCC: TClientDataSet);
 begin
   Self.FCdsOrcamentoCC := oCdsOrcamentoCC;
@@ -44,18 +54,28 @@ begin
     Self.FCdsOrcamentoCC.Delete;
 
   if (TConfigFile.GetInstance.IsDataBasePostgreSql) and
-     (dmDataBase.OrcamentoCentroCusto.Locate(uOrcamentoCentroCusto.ID, iId)) then
-     dmDataBase.OrcamentoCentroCusto.Delete;
+     (Self.GetOrcamentoCentroCusto.Locate(uOrcamentoCentroCusto.ID, iId)) then
+    Self.GetOrcamentoCentroCusto.Delete;
+end;
+
+function TOrcamentoCentroCustoDAO.GetConnectionPostgreSQL: TFDConnection;
+begin
+  Result := dmDataBase.ConnectionPostgreSQL;
+end;
+
+function TOrcamentoCentroCustoDAO.GetOrcamentoCentroCusto: TFDTable;
+begin
+  Result := dmDataBase.OrcamentoCentroCusto;
 end;
 
 procedure TOrcamentoCentroCustoDAO.SetConnectionOrcamentoCentroCusto;
 begin
-  dmDataBase.ConnectionPostgreSQL.Params.Values['Database'] := TConfigFile.GetInstance.GetDataBase;
-  dmDataBase.ConnectionPostgreSQL.Params.Values['User_Name'] := TConfigFile.GetInstance.GetDataBaseUser;
-  dmDataBase.ConnectionPostgreSQL.Params.Values['Password'] := TConfigFile.GetInstance.GetDataBasePassword;
-  dmDataBase.ConnectionPostgreSQL.Params.Values['Server'] := TConfigFile.GetInstance.GetDataBaseIp;
-  dmDataBase.ConnectionPostgreSQL.Params.Values['Port'] := TConfigFile.GetInstance.GetDataBasePort;
-  dmDataBase.ConnectionPostgreSQL.Connected := True;
+  Self.GetConnectionPostgreSQL.Params.Values[DATABASE] := TConfigFile.GetInstance.GetDataBase;
+  Self.GetConnectionPostgreSQL.Params.Values[USER_NAME] := TConfigFile.GetInstance.GetDataBaseUser;
+  Self.GetConnectionPostgreSQL.Params.Values[PASSWORD] := TConfigFile.GetInstance.GetDataBasePassword;
+  Self.GetConnectionPostgreSQL.Params.Values[SERVER] := TConfigFile.GetInstance.GetDataBaseIp;
+  Self.GetConnectionPostgreSQL.Params.Values[PORT] := TConfigFile.GetInstance.GetDataBasePort;
+  Self.GetConnectionPostgreSQL.Connected := True;
 end;
 
 procedure TOrcamentoCentroCustoDAO.InsertClientDataSet(
@@ -78,17 +98,17 @@ begin
   begin
     Self.FCdsOrcamentoCC.Insert;
     Self.FCdsOrcamentoCC.FieldByName(uOrcamentoCentroCusto.ID).AsInteger :=
-      dmDataBase.OrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.ID).AsInteger;
+      Self.GetOrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.ID).AsInteger;
     Self.FCdsOrcamentoCC.FieldByName(uOrcamentoCentroCusto.ORCAMENTO).AsInteger :=
-      dmDataBase.OrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.ORCAMENTO).AsInteger;
+      Self.GetOrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.ORCAMENTO).AsInteger;
     Self.FCdsOrcamentoCC.FieldByName(uOrcamentoCentroCusto.CENTROCUSTO).AsString :=
-      dmDataBase.OrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.CENTROCUSTO).AsString;
+      Self.GetOrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.CENTROCUSTO).AsString;
     Self.FCdsOrcamentoCC.FieldByName(uOrcamentoCentroCusto.CENTROCUSTOPAI).AsString :=
-      dmDataBase.OrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.CENTROCUSTOPAI).AsString;
+      Self.GetOrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.CENTROCUSTOPAI).AsString;
     Self.FCdsOrcamentoCC.FieldByName(uOrcamentoCentroCusto.CENTROCUSTOFILHO).AsString :=
-      dmDataBase.OrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.CENTROCUSTOFILHO).AsString;
+      Self.GetOrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.CENTROCUSTOFILHO).AsString;
     Self.FCdsOrcamentoCC.FieldByName(uOrcamentoCentroCusto.VALOR).AsCurrency :=
-      dmDataBase.OrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.VALOR).AsCurrency;
+      Self.GetOrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.VALOR).AsCurrency;
     Self.FCdsOrcamentoCC.Post;
 
     dmDataBase.OrcamentoCentroCusto.Next;
@@ -97,28 +117,28 @@ end;
 
 procedure TOrcamentoCentroCustoDAO.UpdateOrcamentoCentroCustoDataBase(oOrcamentoCentroCusto: TOrcamentoCentroCusto);
 begin
-  if dmDataBase.OrcamentoCentroCusto.Locate(uOrcamentoCentroCusto.ID, oOrcamentoCentroCusto.Id) then
+  if Self.GetOrcamentoCentroCusto.Locate(uOrcamentoCentroCusto.ID, oOrcamentoCentroCusto.Id) then
   begin
-    dmDataBase.OrcamentoCentroCusto.Edit;
+    Self.GetOrcamentoCentroCusto.Edit;
     Self.SetOrcamentoCentroCustoDataBase(oOrcamentoCentroCusto);
-    dmDataBase.OrcamentoCentroCusto.Post;
+    Self.GetOrcamentoCentroCusto.Post;
   end;
 end;
 
 procedure TOrcamentoCentroCustoDAO.InsertOrcamentoCentroCustoDataBase(oOrcamentoCentroCusto: TOrcamentoCentroCusto);
 begin
-  dmDataBase.OrcamentoCentroCusto.Insert;
+  Self.GetOrcamentoCentroCusto.Insert;
   Self.SetOrcamentoCentroCustoDataBase(oOrcamentoCentroCusto);
-  dmDataBase.OrcamentoCentroCusto.Post;
+  Self.GetOrcamentoCentroCusto.Post;
 end;
 
 procedure TOrcamentoCentroCustoDAO.SetOrcamentoCentroCustoDataBase(oOrcamentoCentroCusto: TOrcamentoCentroCusto);
 begin
-  dmDataBase.OrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.ORCAMENTO).AsInteger := oOrcamentoCentroCusto.Orcamento;
-  dmDataBase.OrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.CENTROCUSTO).AsString := oOrcamentoCentroCusto.CentroCusto;
-  dmDataBase.OrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.CENTROCUSTOPAI).AsString := oOrcamentoCentroCusto.CentroCustoPai;
-  dmDataBase.OrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.CENTROCUSTOFILHO).AsString := oOrcamentoCentroCusto.CentroCustoFilho;
-  dmDataBase.OrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.VALOR).AsCurrency := oOrcamentoCentroCusto.Valor;
+  Self.GetOrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.ORCAMENTO).AsInteger := oOrcamentoCentroCusto.Orcamento;
+  Self.GetOrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.CENTROCUSTO).AsString := oOrcamentoCentroCusto.CentroCusto;
+  Self.GetOrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.CENTROCUSTOPAI).AsString := oOrcamentoCentroCusto.CentroCustoPai;
+  Self.GetOrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.CENTROCUSTOFILHO).AsString := oOrcamentoCentroCusto.CentroCustoFilho;
+  Self.GetOrcamentoCentroCusto.FieldByName(uOrcamentoCentroCusto.VALOR).AsCurrency := oOrcamentoCentroCusto.Valor;
 end;
 
 procedure TOrcamentoCentroCustoDAO.Save(
@@ -150,8 +170,8 @@ end;
 procedure TOrcamentoCentroCustoDAO.SaveDataBase(
   oOrcamentoCentroCusto: TOrcamentoCentroCusto);
 begin
-  if not dmDataBase.OrcamentoCentroCusto.Active then
-    dmDataBase.OrcamentoCentroCusto.Open;
+  if not Self.GetOrcamentoCentroCusto.Active then
+    Self.GetOrcamentoCentroCusto.Open;
 
   if oOrcamentoCentroCusto.Id > System.Math.ZeroValue then
     Self.UpdateOrcamentoCentroCustoDataBase(oOrcamentoCentroCusto)
@@ -164,6 +184,7 @@ procedure TOrcamentoCentroCustoDAO.UpdateClientDataSet(
 begin
   if not Self.FCdsOrcamentoCC.Locate(uOrcamentoCentroCusto.ID, oOrcamentoCentroCusto.Id, []) then
     Exit;
+
   Self.FCdsOrcamentoCC.Edit;
   Self.SetCdsOrcamentoCC(oOrcamentoCentroCusto);
   Self.FCdsOrcamentoCC.Post;

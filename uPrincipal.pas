@@ -16,12 +16,9 @@ type
     Panel2: TPanel;
     cdsOrcamentoCC: TClientDataSet;
     dsOrcamentoCC: TDataSource;
-    grdResumoOrcamento: TDBGrid;
     cdsOrcamentoCCID: TIntegerField;
     cdsOrcamentoCCVALOR: TCurrencyField;
     cdsOrcamentoCCORCAMENTO: TSmallintField;
-    grdResumoCentroCustoPai: TDBGrid;
-    grdResumoCentroCustoFilho: TDBGrid;
     cdsResumoOrcamento: TClientDataSet;
     cdsResumoOrcamentoID: TSmallintField;
     cdsResumoOrcamentoORCAMENTO: TSmallintField;
@@ -45,12 +42,15 @@ type
     grdOrcamentoCentroCusto: TDBGrid;
     btnAlterar: TSpeedButton;
     btnExcluir: TSpeedButton;
+    GroupBox1: TGroupBox;
+    grdResumoCentroCustoPai: TDBGrid;
+    GroupBox2: TGroupBox;
+    grdResumoOrcamento: TDBGrid;
+    GroupBox3: TGroupBox;
+    grdResumoCentroCustoFilho: TDBGrid;
     procedure btnNovoClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure edtValorKeyPress(Sender: TObject; var Key: Char);
-    procedure edtOrcamentoKeyPress(Sender: TObject; var Key: Char);
     procedure FormDestroy(Sender: TObject);
-    procedure edtCentroCustoKeyPress(Sender: TObject; var Key: Char);
     procedure btnAlterarClick(Sender: TObject);
     procedure btnExcluirClick(Sender: TObject);
   private
@@ -78,9 +78,6 @@ type
     procedure LoadResumos;
     procedure LoadOrcamentoCentroCustoToCdsOrcamentoCC;
 
-    function isAllowedCurrency(const Key: Char): Boolean;
-    function isAllowedInteger(const Key: Char): Boolean;
-    function isAllowed(const Key: Char; const AllowedKeyList: TSysCharSet): Boolean;
     function InitOrcamentoCentroCusto: TOrcamentoCentroCusto;
     function HaveData: Boolean;
     function GetOrcamentoCentroCustoList: TObjectList<TOrcamentoCentroCusto>;
@@ -92,6 +89,7 @@ const
   NONE = #0;
   BACK_SPACE = #8;
   SEMICOLON = #44;
+  XML_FILE_NAME = 'orcamentocentrocusto.xml';
 
 var
   frmPrincipal: TfrmPrincipal;
@@ -145,12 +143,6 @@ begin
   cdsResumoCentroCustoFilho.DisableControls;
 end;
 
-procedure TfrmPrincipal.edtCentroCustoKeyPress(Sender: TObject; var Key: Char);
-begin
-  if not isAllowedInteger(Key) then
-    Key := NONE;
-end;
-
 procedure TfrmPrincipal.InitClientDataSets;
 begin
   cdsOrcamentoCC.CreateDataSet;
@@ -176,12 +168,6 @@ begin
   Result := TOrcamentoCentroCusto.Create;;
 end;
 
-function TfrmPrincipal.isAllowed(const Key: Char;
-  const AllowedKeyList: TSysCharSet): Boolean;
-begin
-  Result := CharInSet(Key, AllowedKeyList);
-end;
-
 procedure TfrmPrincipal.InitServiceOrcamentoCentroCusto;
 begin
   Self.FServiceOrcamentoCentroCusto := TServiceOrcamentoCentroCusto.Create(cdsOrcamentoCC);
@@ -192,16 +178,6 @@ begin
   Self.DisableControlsCds;
   Self.CallViewCadOrcamentoCentroCusto(Self.InitOrcamentoCentroCusto);
   Self.EnableControlsCds;
-end;
-
-function TfrmPrincipal.isAllowedCurrency(const Key: Char): Boolean;
-begin
-  Result := isAllowed(Key, ['0'..'9', BACK_SPACE,SEMICOLON]);
-end;
-
-function TfrmPrincipal.isAllowedInteger(const Key: Char): Boolean;
-begin
-  Result := isAllowed(Key, ['0'..'9', BACK_SPACE]);
 end;
 
 procedure TfrmPrincipal.LoadOrcamentoCentroCusto(
@@ -254,16 +230,17 @@ begin
     oOrcamentoCentroCustoList.Add(oOrcamentoCentroCusto);
     cdsOrcamentoCC.Next;
   end;
+  cdsOrcamentoCC.First;
   Result := oOrcamentoCentroCustoList;
 end;
 
 procedure TfrmPrincipal.LoadXMLFile;
 begin
   if (not TConfigFile.GetInstance.IsDataBasePostgreSql) and
-     (FileExists(ExtractFilePath(Application.ExeName)+'orcamentocentrocusto.xml')) then
+     (FileExists(ExtractFilePath(Application.ExeName)+XML_FILE_NAME)) then
   begin
     Self.DisableControlsCds;
-    cdsOrcamentoCC.LoadFromFile(ExtractFilePath(Application.ExeName)+'orcamentocentrocusto.xml');
+    cdsOrcamentoCC.LoadFromFile(ExtractFilePath(Application.ExeName)+XML_FILE_NAME);
     Self.LoadResumos;
     Self.EnableControlsCds;
   end;
@@ -273,7 +250,7 @@ procedure TfrmPrincipal.SaveXMLFile;
 begin
   if (not TConfigFile.GetInstance.IsDataBasePostgreSql) then
   begin
-    cdsOrcamentoCC.SaveToFile(ExtractFilePath(Application.ExeName)+'orcamentocentrocusto.xml');
+    cdsOrcamentoCC.SaveToFile(ExtractFilePath(Application.ExeName)+XML_FILE_NAME);
   end;
 end;
 
@@ -283,23 +260,12 @@ var
 begin
   if not self.HaveData then
     Exit;
+
   Self.DisableControlsCds;
   oOrcamentoCentroCusto := Self.InitOrcamentoCentroCusto;
   Self.LoadOrcamentoCentroCusto(oOrcamentoCentroCusto);
   Self.CallViewCadOrcamentoCentroCusto(oOrcamentoCentroCusto);
   Self.EnableControlsCds;
-end;
-
-procedure TfrmPrincipal.edtOrcamentoKeyPress(Sender: TObject; var Key: Char);
-begin
-  if not isAllowedInteger(Key) then
-    Key := NONE;
-end;
-
-procedure TfrmPrincipal.edtValorKeyPress(Sender: TObject; var Key: Char);
-begin
-  if not isAllowedCurrency(Key) then
-    Key := NONE;
 end;
 
 procedure TfrmPrincipal.EnableControlsCds;

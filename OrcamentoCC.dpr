@@ -15,7 +15,8 @@ uses
   uOrcamentoCentroCustoDAO in 'OrcamentoCentroCusto\DAO\uOrcamentoCentroCustoDAO.pas',
   uCadOrcamentoCentroCusto in 'OrcamentoCentroCusto\View\uCadOrcamentoCentroCusto.pas' {frmCadOrcamentoCentroCusto},
   udmDataBase in 'Connection\udmDataBase.pas' {dmDataBase: TDataModule},
-  uConfigFile in 'Utils\uConfigFile.pas';
+  uConfigFile in 'Utils\uConfigFile.pas',
+  uConfigOrcamentoCentroCusto in 'Utils\Model\uConfigOrcamentoCentroCusto.pas';
 
 {$R *.res}
 

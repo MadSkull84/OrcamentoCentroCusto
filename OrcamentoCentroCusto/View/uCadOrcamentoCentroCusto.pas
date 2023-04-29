@@ -82,18 +82,23 @@ begin
 end;
 
 procedure TfrmCadOrcamentoCentroCusto.Save;
+const
+  TITULO_ERRO = 'Erro';
+  TITULO_INFORMACAO = 'Informação';
+  MSG_SUCESSO = 'Registro salvo com sucesso.';
 var
   sMsgError: string;
 begin
   Self.SetOrcamentoCentroCusto;
   if not ServiceOrcamentoCentroCusto.IsRequiredFieldsValid(Self.OrcamentoCentroCusto, sMsgError) then
   begin
-    Application.MessageBox(PWideChar(sMsgError), 'Aviso', MB_ICONERROR + MB_OK);
-    Exit();
+    Application.MessageBox(PWideChar(sMsgError), TITULO_ERRO, MB_ICONERROR + MB_OK);
+    Exit;
   end;
 
   ServiceOrcamentoCentroCusto.Save(Self.OrcamentoCentroCusto);
   ConcreteSubjectOrcamentoCentroCusto.Notify(Self.OrcamentoCentroCusto);
+  Application.MessageBox(MSG_SUCESSO, TITULO_INFORMACAO, MB_ICONINFORMATION + MB_OK);
 end;
 
 procedure TfrmCadOrcamentoCentroCusto.SetFields;
@@ -163,7 +168,7 @@ end;
 procedure TfrmCadOrcamentoCentroCusto.FormShow(Sender: TObject);
 begin
   Self.InitServiceOrcamentoCentroCusto;
-  if OrcamentoCentroCusto.Id > System.Math.ZeroValue then
+  if Self.OrcamentoCentroCusto.Id > System.Math.ZeroValue then
     Self.SetFields;
 end;
 

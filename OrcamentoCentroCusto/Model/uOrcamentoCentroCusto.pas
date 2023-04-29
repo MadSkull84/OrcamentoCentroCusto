@@ -30,10 +30,20 @@ type
     property CentroCusto: String read FCentroCusto write FCentroCusto;
     property Valor: Currency read FValor write FValor;
     property Diferenca: Currency read FDiferenca write FDiferenca;
+
+    constructor Create;
   end;
 
 implementation
 
+uses System.Math;
+
 { TOrcamentoCentroCusto }
+
+constructor TOrcamentoCentroCusto.Create;
+begin
+  Self.FId := System.Math.ZeroValue;
+  Self.FDiferenca := System.Math.ZeroValue;
+end;
 
 end.

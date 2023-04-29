@@ -37,7 +37,7 @@ object frmPrincipal: TfrmPrincipal
         Top = 8
         Width = 82
         Height = 21
-        Caption = 'Novo'
+        Caption = '&Novo'
         OnClick = btnNovoClick
       end
       object btnAlterar: TSpeedButton
@@ -45,7 +45,7 @@ object frmPrincipal: TfrmPrincipal
         Top = 8
         Width = 82
         Height = 21
-        Caption = 'Alterar'
+        Caption = '&Alterar'
         OnClick = btnAlterarClick
       end
       object btnExcluir: TSpeedButton
@@ -53,7 +53,7 @@ object frmPrincipal: TfrmPrincipal
         Top = 8
         Width = 82
         Height = 21
-        Caption = 'Excluir'
+        Caption = '&Excluir'
         OnClick = btnExcluirClick
       end
     end
@@ -99,111 +99,149 @@ object frmPrincipal: TfrmPrincipal
     Height = 234
     Align = alClient
     TabOrder = 1
+    ExplicitTop = 198
     object Splitter1: TSplitter
-      Left = 248
+      Left = 256
       Top = 1
       Height = 232
-      ExplicitLeft = 328
-      ExplicitTop = 112
-      ExplicitHeight = 100
+      ExplicitLeft = 193
+      ExplicitTop = 6
     end
     object Splitter2: TSplitter
-      Left = 517
+      Left = 521
       Top = 1
       Height = 232
       Align = alRight
-      ExplicitLeft = 304
-      ExplicitTop = 176
-      ExplicitHeight = 100
+      ExplicitLeft = 593
+      ExplicitTop = 0
     end
-    object grdResumoOrcamento: TDBGrid
-      Left = 1
+    object GroupBox1: TGroupBox
+      Left = 259
       Top = 1
-      Width = 247
-      Height = 232
-      Align = alLeft
-      DataSource = dsResumoOrcamento
-      Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
-      TabOrder = 0
-      TitleFont.Charset = DEFAULT_CHARSET
-      TitleFont.Color = clWindowText
-      TitleFont.Height = -11
-      TitleFont.Name = 'Tahoma'
-      TitleFont.Style = []
-      Columns = <
-        item
-          Expanded = False
-          FieldName = 'ORCAMENTO'
-          Width = 102
-          Visible = True
-        end
-        item
-          Expanded = False
-          FieldName = 'VALOR'
-          Width = 105
-          Visible = True
-        end>
-    end
-    object grdResumoCentroCustoPai: TDBGrid
-      Left = 251
-      Top = 1
-      Width = 266
+      Width = 262
       Height = 232
       Align = alClient
-      DataSource = dsResumoCentroCustoPai
-      Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
-      TabOrder = 1
-      TitleFont.Charset = DEFAULT_CHARSET
-      TitleFont.Color = clWindowText
-      TitleFont.Height = -11
-      TitleFont.Name = 'Tahoma'
-      TitleFont.Style = []
-      Columns = <
-        item
-          Expanded = False
-          FieldName = 'CENTRO_CUSTO_PAI'
-          Width = 130
-          Visible = True
-        end
-        item
-          Expanded = False
-          FieldName = 'VALOR'
-          Width = 93
-          Visible = True
-        end>
+      Caption = 'Resumo por Centro Custo Pai '
+      TabOrder = 0
+      ExplicitLeft = 296
+      ExplicitTop = 24
+      ExplicitWidth = 185
+      ExplicitHeight = 105
+      object grdResumoCentroCustoPai: TDBGrid
+        Left = 2
+        Top = 15
+        Width = 258
+        Height = 215
+        Align = alClient
+        DataSource = dsResumoCentroCustoPai
+        Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+        TabOrder = 0
+        TitleFont.Charset = DEFAULT_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -11
+        TitleFont.Name = 'Tahoma'
+        TitleFont.Style = []
+        Columns = <
+          item
+            Expanded = False
+            FieldName = 'CENTRO_CUSTO_PAI'
+            Width = 124
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'VALOR'
+            Width = 93
+            Visible = True
+          end>
+      end
     end
-    object grdResumoCentroCustoFilho: TDBGrid
-      Left = 520
+    object GroupBox2: TGroupBox
+      Left = 1
       Top = 1
-      Width = 259
+      Width = 255
+      Height = 232
+      Align = alLeft
+      Caption = 'Resumo por Or'#231'amento '
+      TabOrder = 1
+      object grdResumoOrcamento: TDBGrid
+        Left = 2
+        Top = 15
+        Width = 251
+        Height = 215
+        Align = alClient
+        DataSource = dsResumoOrcamento
+        Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+        TabOrder = 0
+        TitleFont.Charset = DEFAULT_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -11
+        TitleFont.Name = 'Tahoma'
+        TitleFont.Style = []
+        Columns = <
+          item
+            Expanded = False
+            FieldName = 'ORCAMENTO'
+            Width = 107
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'VALOR'
+            Width = 105
+            Visible = True
+          end>
+      end
+    end
+    object GroupBox3: TGroupBox
+      Left = 524
+      Top = 1
+      Width = 255
       Height = 232
       Align = alRight
-      DataSource = dsResumoCentroCustoFilho
-      Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+      Caption = 'Resumo por Centro Custo Filho '
       TabOrder = 2
-      TitleFont.Charset = DEFAULT_CHARSET
-      TitleFont.Color = clWindowText
-      TitleFont.Height = -11
-      TitleFont.Name = 'Tahoma'
-      TitleFont.Style = []
-      Columns = <
-        item
-          Expanded = False
-          FieldName = 'CENTRO_CUSTO_FILHO'
-          Width = 118
-          Visible = True
-        end
-        item
-          Expanded = False
-          FieldName = 'VALOR'
-          Width = 96
-          Visible = True
-        end>
+      object grdResumoCentroCustoFilho: TDBGrid
+        Left = 2
+        Top = 15
+        Width = 251
+        Height = 215
+        Align = alClient
+        DataSource = dsResumoCentroCustoFilho
+        Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+        TabOrder = 0
+        TitleFont.Charset = DEFAULT_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -11
+        TitleFont.Name = 'Tahoma'
+        TitleFont.Style = []
+        Columns = <
+          item
+            Expanded = False
+            FieldName = 'CENTRO_CUSTO_FILHO'
+            Width = 115
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'VALOR'
+            Width = 96
+            Visible = True
+          end>
+      end
     end
   end
   object cdsOrcamentoCC: TClientDataSet
     Aggregates = <>
+    FieldDefs = <>
+    IndexDefs = <
+      item
+        Name = 'idxOrcamentoCentroCusto'
+        Fields = 'ORCAMENTO;CENTRO_CUSTO'
+      end>
+    IndexName = 'idxOrcamentoCentroCusto'
     Params = <>
+    StoreDefs = True
     Left = 424
     Top = 17
     object cdsOrcamentoCCID: TIntegerField
@@ -245,7 +283,15 @@ object frmPrincipal: TfrmPrincipal
   end
   object cdsResumoOrcamento: TClientDataSet
     Aggregates = <>
+    FieldDefs = <>
+    IndexDefs = <
+      item
+        Name = 'idxOrcamento'
+        Fields = 'ORCAMENTO'
+      end>
+    IndexName = 'idxOrcamento'
     Params = <>
+    StoreDefs = True
     Left = 40
     Top = 313
     object cdsResumoOrcamentoID: TSmallintField
@@ -270,7 +316,15 @@ object frmPrincipal: TfrmPrincipal
   end
   object cdsResumoCentroCustoPai: TClientDataSet
     Aggregates = <>
+    FieldDefs = <>
+    IndexDefs = <
+      item
+        Name = 'idxCentroCustoPai'
+        Fields = 'CENTRO_CUSTO_PAI'
+      end>
+    IndexName = 'idxCentroCustoPai'
     Params = <>
+    StoreDefs = True
     Left = 280
     Top = 313
     object cdsResumoCentroCustoPaiVALOR: TCurrencyField
@@ -292,7 +346,15 @@ object frmPrincipal: TfrmPrincipal
   end
   object cdsResumoCentroCustoFilho: TClientDataSet
     Aggregates = <>
+    FieldDefs = <>
+    IndexDefs = <
+      item
+        Name = 'idxCentroCustoFilho'
+        Fields = 'CENTRO_CUSTO_FILHO'
+      end>
+    IndexName = 'idxCentroCustoFilho'
     Params = <>
+    StoreDefs = True
     Left = 560
     Top = 321
     object cdsResumoCentroCustoFilhoCENTRO_CUSTO_FILHO: TStringField
